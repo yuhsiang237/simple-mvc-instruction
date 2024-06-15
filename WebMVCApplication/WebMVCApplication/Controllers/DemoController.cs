@@ -9,10 +9,15 @@ namespace WebMVCApplication.Controllers
     public class DemoController : Controller
     {
         private readonly TodoManageRepository _todoManageRepository;
+        private readonly TodoManageEFCoreRepository _todoManageEFCoreRepository;
+
         private readonly JsonSerializerOptions _JSONOptions;
-        public DemoController(TodoManageRepository todoManageRepository)
+        public DemoController(
+            TodoManageRepository todoManageRepository,
+            TodoManageEFCoreRepository todoManageEFCoreRepository)
         {
             _todoManageRepository = todoManageRepository;
+            _todoManageEFCoreRepository = todoManageEFCoreRepository;
             _JSONOptions = new JsonSerializerOptions
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -105,5 +110,47 @@ namespace WebMVCApplication.Controllers
             }, _JSONOptions);
         }
         #endregion Dapper 操作範例
+
+        #region EF Core 操作範例
+        public IActionResult EFCoreDemo()
+        {
+            return View();
+        }
+        /// <summary>
+        /// EF Core查詢操作
+        /// </summary>
+        /// <returns></returns>
+        public async Task<JsonResult> GetEFCoreDataAsync()
+        {
+            var result1 = await _todoManageEFCoreRepository.GetUserListAsync();
+            var result2 = await _todoManageEFCoreRepository.GetTodoListAsync();
+
+            return new JsonResult(new
+            {
+                result1,
+                result2
+            }, _JSONOptions);
+        }
+        /// <summary>
+        /// EF Core更新操作
+        /// https://localhost:7298/demo/UpdateEFCoreDataAsync?id=3&iscomplete=true
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="isComplete"></param>
+        /// <returns></returns>
+        [HttpGet("demo/UpdateEFCoreDataAsync")]
+        public async Task<JsonResult> UpdateEFCoreDataAsync(int id, bool isComplete)
+        {
+            var result1 = await _todoManageRepository.UpdateTodoListAsync(id,isComplete);
+            var result2 = await _todoManageEFCoreRepository.GetTodoListAsync();
+
+            return new JsonResult(new
+            {
+                effectCount = result1,
+                result2
+            }, _JSONOptions);
+        }
+        #endregion EF Core 操作範例
+
     }
 }

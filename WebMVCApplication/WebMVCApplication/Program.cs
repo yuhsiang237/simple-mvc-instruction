@@ -1,10 +1,18 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using WebMVCApplication.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// µù¥U DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(@"Server=.\SQLExpress;Database=TodoDB;Trusted_Connection=True;ConnectRetryCount=0"));
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<TodoManageRepository>();
+builder.Services.AddScoped<TodoManageEFCoreRepository>();
+
 
 var app = builder.Build();
 
