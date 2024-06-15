@@ -1,0 +1,22 @@
+﻿@model WebMVCApplication.ViewModels.ValuePassDemoViewModel;
+@{
+    ViewData["Title"] = "三種頁面傳值示範";
+}
+@{
+    var gameViewData = @ViewData["DemoModel2"] as WebMVCApplication.ViewModels.GameViewData;
+}
+<div>
+    <h1>三種頁面傳值示範</h1>
+    遊戲公司:@Model.Company
+    <br />
+    遊戲:@ViewBag?.DemoModel1?.Game、@gameViewData?.Game、
+    @for (var i = 0; i < Model?.Games?.Count(); i++)
+    {
+        <span>@Model.Games[i]</span>
+        @if (Model.Games.Count() - 1 != i)
+        {
+            <span>、</span>
+        }
+    }
+
+</div>
