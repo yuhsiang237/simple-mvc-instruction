@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "使用者介紹";
+}
+
+<div>
+    <h1>使用者介紹</h1>
+    <!--使用@Html PartialAsync 好處:非同步資源載入有效利用 -->
+    @{
+        var nameCardDataModel = new WebMVCApplication.ViewModels.NameCardViewModel
+            {
+                Name = ViewBag.NameCardData.Name,
+                Address = ViewBag.NameCardData.Address,
+                Email = ViewBag.NameCardData.Email,
+            };
+    }
+    @await Html.PartialAsync("~/Views/Shared/Partial/_NameCardPartial.cshtml",nameCardDataModel)
+    
+    <!--使用Tag Helpers-->
+    <!-- 
+        <partial name="~/Views/Shared/Partial/_NameCardPartial.cshtml"></partial>
+    -->
+</div>
