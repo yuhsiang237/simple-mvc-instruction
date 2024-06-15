@@ -18,5 +18,33 @@ namespace WebMVCApplication.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 三種頁面傳值示範
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult ValuePassDemo()
+        {
+            ViewBag.DemoModel1 = new
+            {
+                Game = "隻狼"
+            };
+            ViewData["DemoModel2"] = new GameViewData
+            {
+                Game = "血源詛咒"
+
+            };
+
+            var demoModel3 = new ValuePassDemoViewModel
+            {
+                Company = "FromSoftware",
+                Games = new List<string>
+                {
+                    "黑暗靈魂",
+                    "黑暗靈魂III",
+                }
+            };
+
+            return View(demoModel3);
+        }
     }
 }
