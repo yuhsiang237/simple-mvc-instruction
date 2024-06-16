@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.Json;
 using System.Transactions;
 using WebMVCApplication.DataAccess;
+using WebMVCApplication.Models.Validators;
 using WebMVCApplication.ViewModels;
 
 namespace WebMVCApplication.Controllers
@@ -152,5 +154,63 @@ namespace WebMVCApplication.Controllers
         }
         #endregion EF Core 操作範例
 
+        public IActionResult CreateUser()
+        {
+            ViewBag.InterestOptions = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Reading", Text = "Reading" },
+                new SelectListItem { Value = "Traveling", Text = "Traveling" },
+                new SelectListItem { Value = "Sports", Text = "Sports" },
+                new SelectListItem { Value = "Music", Text = "Music" }
+                // Add more interests as needed
+            };
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateUser(UserData model)
+        {
+            ViewBag.InterestOptions = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Reading", Text = "Reading" },
+                new SelectListItem { Value = "Traveling", Text = "Traveling" },
+                new SelectListItem { Value = "Sports", Text = "Sports" },
+                new SelectListItem { Value = "Music", Text = "Music" }
+                // Add more interests as needed
+            };
+            var validator = new UserDataValidator();
+            var result = validator.Validate(model);
+            if(!result.IsValid)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                ViewBag.IsScuess = false;
+                return View(model);
+            }
+
+            ViewBag.IsScuess = true;
+            return View();
+            //return RedirectToAction("CreateUser");
+        }
+
+
+        [HttpPost]
+        [Route("/demo/api/CreateUser")]
+        public IActionResult CreateUserAPI([FromBody] UserData model)
+        {
+            // Validate the model using FluentValidation
+            var validator = new UserDataValidator();
+            var result = validator.Validate(model);
+
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            // Handle valid user data
+            return Ok("User created successfully");
+        }
     }
 }
