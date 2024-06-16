@@ -1,0 +1,179 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model WebMVCApplication.Models.Validators.UserData;
+
+<h3>表單驗證-使用asp form</h3>
+<div>
+    @if (@ViewBag.IsScuess != null) {
+        <span>傳送結果: @ViewBag.IsScuess</span>
+    }
+    <form asp-action="CreateUser" method="post">
+        <div>
+            <label asp-for="FirstName"></label>
+            <input asp-for="FirstName" />
+            <span asp-validation-for="FirstName"></span>
+        </div>
+        <div>
+            <label asp-for="LastName"></label>
+            <input asp-for="LastName" />
+            <span asp-validation-for="LastName"></span>
+        </div>
+        <div>
+            <label asp-for="Email"></label>
+            <input asp-for="Email" />
+            <span asp-validation-for="Email"></span>
+        </div>
+        <label>Gender</label>
+        <div>
+            <input type="radio" asp-for="Gender" value="1" /> Male
+            <input type="radio" asp-for="Gender" value="2" /> Female
+            <input type="radio" asp-for="Gender" value="3" /> Other
+        </div>
+        <span asp-validation-for="Gender"></span>
+        <div>
+            <label asp-for="Age"></label>
+            <input asp-for="Age" />
+            <span asp-validation-for="Age"></span>
+        </div>
+        <div>
+            <label asp-for="Interests">Interests</label>
+            <select asp-for="Interests" asp-items="ViewBag.InterestOptions" multiple="multiple"></select>
+            <span asp-validation-for="Interests"></span>
+        </div>
+        <div>
+            <label asp-for="UserDetail.School"></label>
+            <input asp-for="UserDetail.School" />
+            <span asp-validation-for="UserDetail.School"></span>
+        </div>
+        <button type="submit">建立</button>
+    </form>
+</div>
+
+<br />
+<hr />
+<br />
+
+<h3>表單驗證By API</h3>
+<form>
+    <div>
+        <label for="FirstName_2">First Name</label>
+        <input type="text" id="FirstName_2" name="FirstName_2" />
+        <span id="FirstNameError_2" class="text-danger"></span>
+    </div>
+    <div>
+        <label for="LastName_2">Last Name</label>
+        <input type="text" id="LastName_2" name="LastName_2" />
+        <span id="LastNameError_2" class="text-danger"></span>
+    </div>
+    <div>
+        <label for="Email_2">Email</label>
+        <input type="email" id="Email_2" name="Email_2" />
+        <span id="EmailError_2" class="text-danger"></span>
+    </div>
+    <label>Gender</label>
+    <div>
+        <input type="radio" name="Gender_2" value="1" /> Male
+        <input type="radio" name="Gender_2" value="2" /> Female
+        <input type="radio" name="Gender_2" value="3" /> Other
+    </div>
+    <span id="GenderError_2" class="text-danger"></span>
+    <div>
+        <label for="Age_2">Age</label>
+        <input type="number" id="Age_2" name="Age_2" />
+        <span id="AgeError_2" class="text-danger"></span>
+    </div>
+    <div>
+        <label for="Interests_2">Interests</label>
+        <select id="Interests_2" name="Interests_2" multiple>
+            <option value="Reading">Reading</option>
+            <option value="Traveling">Traveling</option>
+            <option value="Sports">Sports</option>
+            <option value="Music">Music</option>
+        </select>
+        <span id="InterestsError_2" class="text-danger"></span>
+    </div>
+    <div>
+        <label for="School_2">School</label>
+        <input type="text" id="School_2" name="UserDetail.School_2" />
+        <span id="SchoolError_2" class="text-danger"></span>
+    </div>
+    <button type="button" id="submitBtn">Create</button>
+</form>
+
+<br />
+<hr />
+<br />
+
+<h3>JQuery操作示範</h3>
+<div>
+    <div id="htmlblock"></div>
+    <button type="button" id="insertHtmlBtn">插入HTML</button>
+    <br />
+    數值: <input id="htmlvalue" />
+    <button type="button" id="getvalueBtn">取值</button>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $("#insertHtmlBtn").on('click', function (e) {
+                $('#htmlblock').html("<h1>測試</h1>");
+            });
+            $("#getvalueBtn").on('click', function (e) {
+                alert($('#htmlvalue').val());
+            });
+
+
+            $('#submitBtn').on('click', function (e) {
+                // 需完全mapping到model的屬性 如int就得是0或null，不可以是""，否則model無法mapping
+                var formData = {
+                    FirstName: $('#FirstName_2').val(),
+                    LastName: $('#LastName_2').val(),
+                    Email: $('#Email_2').val(),
+                    Gender: $('input[name="Gender_2"]:checked').val(),
+                    Age: $('#Age_2').val() ? $('#Age_2').val() : 0,
+                    Interests: $('#Interests_2').val() ? $('#Interests_2').val() : [],
+                    UserDetail: {
+                        School: $('#School_2').val()
+                    }
+                };
+
+                var payloadJson = JSON.stringify(formData);
+                console.log(payloadJson);
+                $('#FirstNameError_2').text('');
+                $('#LastNameError_2').text('');
+                $('#EmailError_2').text('');
+                $('#GenderError_2').text('');
+                $('#AgeError_2').text('');
+                $('#InterestsError_2').text('');
+                $('#SchoolError_2').text('');
+
+                $.ajax({
+                    url: '/DEMO/API/CreateUser',
+                    type: 'post',
+                    contentType: 'application/json; charset=utf-8',
+                    data: payloadJson,
+                    success: function (response) {
+                        alert('User created successfully');
+                    },
+                    error: function (xhr) {
+                        alert('error');
+                        if (xhr.responseJSON && xhr.responseJSON.length > 0) {
+                            xhr.responseJSON.forEach(function (error) {
+                                var propertyName = error.propertyName.replace('.', '_');
+                                var errorElement = $('#' + propertyName + 'Error_2');
+                                errorElement.text(error.errorMessage);
+                            });
+                        } else {
+                            alert('An error occurred while creating the user.');
+                        }
+                    }
+                })
+            });
+        });
+    </script>
+}
