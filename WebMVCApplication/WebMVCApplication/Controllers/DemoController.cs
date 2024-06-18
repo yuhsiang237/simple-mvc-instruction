@@ -212,5 +212,12 @@ namespace WebMVCApplication.Controllers
             // Handle valid user data
             return Ok("User created successfully");
         }
+
+        [HttpGet]
+        [Route("/about/concact")]
+        public IActionResult Concact()
+        {
+            return View("~/Views/About/Concact.cshtml");
+        }
     }
 }
